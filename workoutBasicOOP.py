@@ -88,7 +88,7 @@ class Vehicle:
         self._mileage = 0.0
         self._speed = 0.0
         
-        type(self).total_vehicles += 1
+        Vehicle.total_vehicles += 1
         
     @property
     def speed(self):
@@ -96,13 +96,13 @@ class Vehicle:
     
     @speed.setter
     def speed(self, new_speed):
-        if (0.0 < new_speed < 250.0):
-            self._speed = new_speed
+        if (0.0 < float(new_speed) and float(new_speed) < 250.0):
+            self._speed = float(new_speed)
         else: 
-            return ValueError("Podana niewlasciwa predkosc.")
+            raise ValueError("Podana niewlasciwa predkosc.")
         
     @property
-    def getMileage(self):
+    def mileage(self):
         return self._mileage
     
     
@@ -134,13 +134,65 @@ class ElectricVehicle(Vehicle):
         
     @property
     def estimated_range(self):
-        return (self._battery_level/100)*self.battery_capacity
+        return (self._battery_level/100)*self.battery_capacity*5
     
     def drive(self, distance_km):
         super().drive(distance_km)
         if (self._battery_level > distance_km/5.0):
             self._battery_level -= distance_km/5.0
         else:
-            return ValueError("Za malo procent baterii.")  
+            raise ValueError("Za malo procent baterii.")  
         
     
+    
+if __name__ == "__main__":
+    print("--- 1. Test licznika i from_string ---")
+    v1 = Vehicle("Toyota", "Corolla", 2020)
+    v2 = Vehicle.from_string("Renault,Clio,2023")
+    ev = ElectricVehicle("Tesla", "Model 3", 2024, battery_capacity=75.0)
+
+    print(f"Liczba aut we flocie: {Vehicle.total_vehicles}")  # Oczekiwane: 3
+    assert Vehicle.total_vehicles == 3, "Błąd: licznik powinien wynosić 3"
+
+    print("\n--- 2. Test właściwości speed i walidacji ---")
+    v1.speed = 120.0
+    print(f"Prędkość v1: {v1.speed} km/h")  # Oczekiwane: 120.0
+    assert v1.speed == 120.0
+
+    try:
+        v1.speed = -15.0
+        print("BŁĄD: Setter przepuścił ujemną prędkość!")
+    except ValueError as e:
+        print(f"Walidacja ujemnej prędkości działa: {e}")
+
+    try:
+        v1.speed = 300.0
+        print("BŁĄD: Setter przepuścił prędkość > 250!")
+    except ValueError as e:
+        print(f"Walidacja zbyt dużej prędkości działa: {e}")
+
+    print("\n--- 3. Test blokady zapisu mileage (Read-Only) ---")
+    try:
+        v1.mileage = 150000.0
+        print("BŁĄD: Mileage nie jest polem read-only!")
+    except AttributeError:
+        print("Mileage jest poprawnie zablokowane przed bezpośrednim zapisem.")
+
+    print("\n--- 4. Test jazdy i baterii w ElectricVehicle ---")
+    print(f"Początkowy zasięg EV: {ev.estimated_range:.1f} km")  # Oczekiwane: 375.0 km
+    assert ev.estimated_range == 375.0
+
+    ev.drive(100)
+    print(f"Przebieg EV po jeździe: {ev.mileage} km")           # Oczekiwane: 100.0 km
+    print(f"Poziom baterii EV: {ev._battery_level:.1f}%")        # Oczekiwane: 80.0%
+    print(f"Nowy zasięg EV: {ev.estimated_range:.1f} km")       # Oczekiwane: 300.0 km
+    assert ev.mileage == 100.0
+    assert ev._battery_level == 80.0
+    assert ev.estimated_range == 300.0
+
+    print("\n--- 5. Test metody statycznej ---")
+    miles = Vehicle.km_to_miles(100)
+    print(f"100 km to w milach: {miles:.2f}")                   # Oczekiwane: 62.14
+    assert round(miles, 2) == 62.14
+
+    print("\nWSZYSTKIE TESTY ZALICZONE!")
