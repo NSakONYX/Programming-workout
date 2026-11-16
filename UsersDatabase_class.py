@@ -39,22 +39,54 @@ class UsersDatabase:
     
     
     def add(self, USER_NAME, USER_SURNAME, USER_EMAIL): 
-        with sqlite3.connect(self.filename) as conn:
+        with sqlite3.connect(self.file_name) as conn:
             cursor = conn.cursor()
             
-            insert = f"INSERT INTO {self.file_name} (user_name,user_surname,user_email) VALUES (?,?,?)"
+            insert = "INSERT INTO users (user_name,user_surname,user_email) VALUES (?,?,?)"
             values = (USER_NAME,USER_SURNAME,USER_EMAIL)
             
             cursor.execute(insert,values)
             conn.commit()
             
-
-        
-
+    
+    def delete_id(self, id):
+        with sqlite3.connect(self.file_name) as conn:
+            cursor = conn.cursor()
+            
+            command = "DELETE FROM users WHERE id = ?"
             
 
+            cursor.execute(command, (id,))
+            conn.commit()
             
             
-            
+    def delete_user(self, name, surname, email):
+        with sqlite3.connect(self.file_name) as conn:
+                cursor = conn.cursor()
+                
+                command = "DELETE FROM users WHERE user_name = ? AND user_surname = ? AND user_email = ?"
+                values = (name,surname,email)
+                
+                cursor.execute(command,values)
+                conn.commit()
 
+    def clear_table(self):
+        with sqlite3.connect(self.file_name) as conn:
+                cursor = conn.cursor()
+                
+                command = "DELETE FROM users"
+                cursor.execute(command)
+                conn.commit()
+
+
+    def print_table(self):
+           with sqlite3.connect(self.file_name) as conn:
+                cursor = conn.cursor()
+                
+                command = "SELECT * FROM users"
+                cursor.execute(command)
+                
+                wyniki = cursor.fetchall()
+                for wiersz in wyniki:
+                    print(f"ID: {wiersz[0]} | NAME: {wiersz[1]} | SURNAME: {wiersz[2]} | EMAIL: {wiersz[3]} | DATE: {wiersz[4]}")
 
