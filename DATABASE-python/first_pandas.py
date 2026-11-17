@@ -82,9 +82,40 @@ df.loc[df['symbol'] == 'NVDA', 'is_active'] = False
 df['volume'] = df['volume'] * 2
 
 df.drop('is_active', axis=1, inplace=True)
+"""
+axis (Oś wykonania operacji)
+Określa kierunek, w którym Pandas ma ciąć tabelę. 
+Wyobraź sobie DataFrame jako prosty układ współrzędnych.
+
+axis=0 (Wiersze/Indeksy): Oś pionowa. 
+Program idzie z góry na dół i szuka wiersza o podanym 
+numerze indeksu. Używasz, gdy chcesz wyrzucić konkretnego 
+klienta czy log transakcji.
+
+axis=1 (Kolumny): Oś pozioma. Program idzie od lewej do 
+prawej po nagłówkach tabeli. Używasz, gdy chcesz amputować 
+całą właściwość, np. wywalić kolumnę is_active ze wszystkich rekordów.
+
+inplace (Zarządzanie pamięcią RAM)
+To flaga bezpieczeństwa, która decyduje, czy modyfikujesz oryginalny 
+obiekt, czy pracujesz na jego kopii.
+
+inplace=False (Zachowanie domyślne): Kiedy odpalasz df.drop(...), 
+Pandas dla bezpieczeństwa w ogóle nie tyka Twojego oryginalnego df. 
+Zamiast tego tworzy w locie nową, zmodyfikowaną kopię tabeli. Żeby 
+to zachować, musisz przypisać wynik do zmiennej:nowa_tabela = df.drop('price', axis=1)
+
+inplace=True (Operacja na żywym organizmie): Mówisz programowi: 
+"wiem co robię, zmodyfikuj fizycznie oryginalne df i nie trać RAM-u na 
+robienie kopii". Funkcja niczego nie zwraca, tylko chirurgicznie wycina element 
+z obecnej pamięci:df.drop('price', axis=1, inplace=True)
+"""
+
+
 
 # Alternatywnie, możesz użyć wbudowanego polecenia Pythona:
 del df['is_active']
+
 
 
 '''
@@ -97,3 +128,7 @@ danymi, które spełniają odwrotny warunek.
 
 # Fizycznie "usuwa" spółkę PLTR z pamięci RAM, zachowując całą resztę (!=)
 df = df[df['symbol'] != 'PLTR']
+
+'''
+drop() usuwa po indexie a != usuwa po zawartosci
+'''
