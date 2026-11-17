@@ -57,13 +57,10 @@ if __name__ == '__main__':
     setup = InicializePandas()
     czyste_dane = setup.analyze_portfolio()
 
-    # ETAP 3: Przetwarzanie i Agregacja
-    
-    # 1. Tworzymy nową kolumnę (cena * wolumen). 
-    # Zauważ, że nie ma tu pętli for - Pandas mnoży całe wektory naraz!
+
     czyste_dane['trade_value'] = czyste_dane['price'] * czyste_dane['volume']
     
-    # 2. Zwijamy setki transakcji do 3 wierszy (podsumowanie dla NVDA, PLTR, TSLA)
+
     raport = czyste_dane.groupby('symbol').agg({
         'volume': 'sum',         # Sumujemy wszystkie kupione akcje
         'trade_value': 'sum',    # Sumujemy wydane dolary
@@ -76,9 +73,7 @@ if __name__ == '__main__':
     print("\n--- RAPORT PORTFELA ---")
     print(raport)
     
-    # ETAP 4: Load (Zrzut do bazy)
-    # Zapisujemy gotowy raport jako nową tabelę. Tym razem 'replace', 
-    # żeby przy każdym uruchomieniu skryptu tabela aktualizowała się na świeżo.
+
     with sqlite3.connect('trades_database.db') as conn:
         raport.to_sql('portfolio_summary', conn, if_exists='replace')
         print("\nZapisano raport do tabeli 'portfolio_summary'!")
