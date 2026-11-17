@@ -23,8 +23,16 @@ class InicializePandas:
             
             cursor.execute(database)
             
-            df = pd.DataFrame(dictionary)
-            df.to_sql('raw_trades', conn, if_exists='append', index=False)
+            cursor.execute("SELECT COUNT(*) FROM raw_trades")
+            ilosc_wierszy = cursor.fetchone()[0]
+            
+            if ilosc_wierszy == 0:
+                print("Baza jest pusta. Generuję i dodaję 500 nowych transakcji...")
+                dictionary = make_dict()
+                df = pd.DataFrame(dictionary)
+                df.to_sql('raw_trades', conn, if_exists='append', index=False)
+            else:
+                print(f"Baza posiada już {ilosc_wierszy} rekordów. Pomijam generowanie.")
             
         
         print("Zainicjalizowano baze danych")  

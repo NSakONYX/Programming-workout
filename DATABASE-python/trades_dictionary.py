@@ -30,6 +30,6 @@ def make_dict():
         surowe_dane['volume'].append(random.randint(10, 500))
         surowe_dane['status'].append(random.choice(statusy))
         
-    print("Wygenerowano 500 transakcji")
+
     return surowe_dane
     
